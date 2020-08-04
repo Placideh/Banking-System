@@ -58,7 +58,7 @@ public class Person{
 				}
 		}
 		return balance;
-	}
+}
 	public static void loginForm(){
 		Scanner scan=new Scanner(System.in);
 		Console console=System.console();
@@ -128,7 +128,7 @@ public class Person{
 			e.printStackTrace();
 			
 		}
-	}
+}
 	public static void signUpAndInsert(){
 		String link="jdbc:mysql://localhost:3306/Bank";
 		String user="root";
