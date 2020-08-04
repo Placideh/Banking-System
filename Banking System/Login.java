@@ -43,36 +43,44 @@ public class Login{
 					String lastName=result.getString(3);//lastname
 					String email=result.getString(4);//email
 					String password=result.getString(5);//password
-					String output="User#%d:%s-%s-%s-%s-%s";
+					int balance=result.getInt(6);
+					String output="User#%d:%s-%s-%s-%s-%s-%d";
 					System.out.println();
-					System.out.println(String.format(output,++count,accountNumber,firstName,lastName,email,password));
+					System.out.println(String.format(output,++count,accountNumber,firstName,lastName,email,password,balance));
 					// System.out.println("account is already exist Please Create other account");
 					System.out.println();
-					System.out.println("What do you want to do ?:");
-					System.out.println("#1.Balance,#2.Deposit,#3.Withdraw,#4.Transfer");
-					int choices=scan.nextInt();
-					switch(choices){
-						case 1:
-							//call balance function
-						break;
 
-						case 2:
-							//call Deposit function
-						break;
+					
+					
 
-						case 3:
-							//call withdraw function
-						break;
+				}
+			}catch(SQLException e){
+				System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
+			}catch (Exception e) {
+				e.printStackTrace();
+				
+			}
+			int balanceAccount=0;
+			
+			String updateQuery="UPDATE account SET balance=? WHERE account_number='"+input+"'";
+			String getBalance="SELECT balance FROM account WHERE account_number='"+input+"'";
 
-						case 4:
-							//call Transfer function
-						break;
 
-						default:
-						System.out.println("invalid Inputs");
-						break;
-					}
-
+			try(Connection conn=DriverManager.getConnection(link,user,dbpassWord)){
+				PreparedStatement statement=conn.prepareStatement(updateQuery);
+				PreparedStatement stat=conn.prepareStatement(getBalance);
+				ResultSet resultBalance=stat.executeQuery();
+				int all=0;
+				while(resultBalance.next()){
+					all=resultBalance.getInt(1);
+				}
+				int bal=Person.bankOperations();
+				balanceAccount=bal+all;
+				statement.setInt(1,balanceAccount);
+				int result=statement.executeUpdate();
+				if (result>0) {
+					System.out.println("Update Made Successully");
+					
 				}
 			}catch(SQLException e){
 				System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
@@ -82,7 +90,7 @@ public class Login{
 			}
 		}
 		else if (option==2) {
-			String QUERY="INSERT INTO account(account_number,first_name,last_name,email,password) VALUES (?,?,?,?,?)";
+			String QUERY="INSERT INTO account(account_number,first_name,last_name,email,password,balance) VALUES (?,?,?,?,?,?)";
 			System.out.println("To create Account Please Refer to the Syntax");
 			System.out.print("Account #xxx-xxx-xxx-xx:");
 			String account=scan.next();
@@ -116,9 +124,9 @@ public class Login{
 			String lastName=lName.substring(0,1).toUpperCase()+lName.substring(1);
 			System.out.print("Email:");
 			String email=scan.next();
-			System.out.print("PassWord:");
-			String passWord=scan.next();
-			System.out.println("Account:"+account+" |FistName:"+firstName+"|LastName:"+lastName+" |Email:"+email+" |PassWord:"+passWord);
+			String  passWord=new String(console.readPassword("PassWord:"));
+			int balance=0;
+			System.out.println("Account:"+account+" |FistName:"+firstName+"|LastName:"+lastName+" |Email:"+email+" |PassWord:"+passWord+"|Balance:"+balance);
 
 			// public void insertItem(String account,String firstName,String lastName,String email,String passWord){
 
@@ -129,6 +137,7 @@ public class Login{
 					statement.setString(3,lastName);
 					statement.setString(4,email);
 					statement.setString(5,passWord);
+					statement.setInt(6,balance);
 					int result=statement.executeUpdate();
 					if (result>0)
 						System.out.println("Account Created ");

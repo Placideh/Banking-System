@@ -8,10 +8,13 @@ public class Person{
 	public Person(){}
 	
 	public static void main(String[] args) {
-		Person person=new Person();
-		person.bankOperations();
+		// Person person=new Person();
+		// person.bankOperations();
+		// bankOperations();
+		int bal=bankOperations();
+		System.out.println("Your Balance Is:"+bal);
 	}
-	public void bankOperations(){
+	public static int bankOperations(){
 		int anotherTransaction=1;
 		int balance=0;
 
@@ -50,12 +53,13 @@ public class Person{
 						System.out.println("invalid transaction:)");
 						break;
 				}
-			anotherTransaction=0;
-			while(anotherTransaction!=1&&anotherTransaction!=2){
-			System.out.println("Do you want another transaction?");
-			System.out.println("Press #1.Yes|#2.No");
-				anotherTransaction=scan.nextInt();
+				anotherTransaction=0;
+				while(anotherTransaction!=1&&anotherTransaction!=2){
+					System.out.println("Do you want another transaction?");
+					System.out.println("Press #1.Yes|#2.No");
+					anotherTransaction=scan.nextInt();
+				}
 		}
-			}
+		return balance;
 }
 }

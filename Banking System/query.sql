@@ -17,4 +17,11 @@
 -- SELECT * FROM account;
 -- SELECT * FROM account WHERE account_number='111-222-333-12' AND password='123456';
 -- SELECT account_number FROM account WHERE account_number='111-222-333-12';
-SELECT account_number FROM account;
+-- SELECT account_number FROM account;
+-- ALTER TABLE account ADD COLUMN balance INT(10);
+-- SELECT * FROM account;
+-- ALTER TABLE account DROP COLUMN balance;
+-- SELECT * FROM account;
+-- ALTER TABLE account ADD COLUMN balance INT(10) NOT NULL;
+SELECT * FROM account;
+
