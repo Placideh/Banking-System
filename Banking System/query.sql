@@ -15,4 +15,6 @@
 -- SELECT * FROM account;
 -- UPDATE account SET password="123456" WHERE account_number="111-222-333-12";
 -- SELECT * FROM account;
-SELECT * FROM account WHERE account_number='111-222-333-12' AND password='123456';
+-- SELECT * FROM account WHERE account_number='111-222-333-12' AND password='123456';
+-- SELECT account_number FROM account WHERE account_number='111-222-333-12';
+SELECT account_number FROM account;

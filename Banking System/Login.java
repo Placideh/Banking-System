@@ -83,8 +83,32 @@ public class Login{
 		}
 		else if (option==2) {
 			String QUERY="INSERT INTO account(account_number,first_name,last_name,email,password) VALUES (?,?,?,?,?)";
+			System.out.println("To create Account Please Refer to the Syntax");
 			System.out.print("Account #xxx-xxx-xxx-xx:");
 			String account=scan.next();
+			/*THI CODES DOWN IT FIRST CHECK IF THE ACCOUNT IS NOT ALREADY IN THE SYSTEM IF YES IT WILL TERMINATE 
+			OR CONTINUE FURTHER PROCESS IF IT IS FALSE*/
+			String checkquery="SELECT account_number FROM account WHERE account_number='"+account+"'";
+			try(Connection conn=DriverManager.getConnection(link,user,dbpassWord)){
+							PreparedStatement statement=conn.prepareStatement(checkquery);
+							ResultSet result=statement.executeQuery();
+							int count=0;
+							while(result.next()){
+								String accountNumber=result.getString(1);//accountnumber
+								String output="User#%d:%s";
+								// System.out.println(String.format(output,++count,accountNumber));
+								System.out.println("Account Exist Please Create Another One");
+								return;
+							}
+			}catch (SQLException e) {
+				System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
+				
+			}catch (Exception e) {
+				e.printStackTrace();
+				
+			}
+			/* THE INSERT WILL CONTINUE BY HERE IF EVERYTHING IS OKAY BUT 
+			THIS CODE IS NOT EFFICIECT IT IS NOT CLEAN BUT I WILL COME TO THAT LATER*/
 			System.out.print("First Name:");
 			String firstName=scan.next().toUpperCase();
 			System.out.print("Last Name:");
@@ -106,23 +130,17 @@ public class Login{
 					statement.setString(4,email);
 					statement.setString(5,passWord);
 					int result=statement.executeUpdate();
-					if (result>0) {
+					if (result>0)
 						System.out.println("Account Created ");
-						
-					}else{
-						System.out.println("Account already existed");
-					}
-
-
-				
-				}catch (SQLException e) {
+					}catch (SQLException e) 
+					{
 					System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
 					
-				}catch (Exception e) {
+					}catch (Exception e) {
 					e.printStackTrace();
 					
 				}
-			// }
+			
 		}
 	}
 }	
