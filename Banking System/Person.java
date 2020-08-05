@@ -10,10 +10,11 @@ public class Person{
 	private String lastName;
 	private String email;
 	private String password;//this are just unused Properties
+
 	public Person(){}
 	public static int bankOperations(){
 		int anotherTransaction=1;
-		int balance=0;
+		 int balance=0;
 
 		Scanner scan=new Scanner(System.in);
 		while (anotherTransaction==1) {
@@ -45,6 +46,8 @@ public class Person{
 						System.out.println("How much money You Want to Transfer?");
 						int amountTransfer=scan.nextInt();
 						balance-=amountTransfer;
+						transfer(accountTransfer,amountTransfer);
+						break;
 					}
 					default:
 						System.out.println("invalid transaction:)");
@@ -70,10 +73,14 @@ public class Person{
 		String input=scan.next().toLowerCase();
 		String  pass=new String(console.readPassword("PassWord:"));
 		System.out.println("Account:"+input+" | PassWord:"+pass);
-		
 		String QUERY="SELECT * FROM account WHERE account_number='" + input + "' AND password='" + pass + "'";
+		if (!QUERY.contains(input)&&QUERY.contains(pass)) {
+			return;
+		}
+
 		try(Connection conn=DriverManager.getConnection(link,user,dbpassWord)){
 				PreparedStatement statement=conn.prepareStatement(QUERY);
+				
 				ResultSet result=statement.executeQuery();
 				int count=0;
 				while(result.next()){
@@ -88,46 +95,45 @@ public class Person{
 					System.out.println(String.format(output,++count,accountNumber,firstName,lastName,email,password,balance));
 					// System.out.println("account is already exist Please Create other account");
 					System.out.println();
+					int bal=Person.bankOperations();
+					/*FROM 107 UP TO 134 IS ABOUT UPDATING THE BALANCE AND WHAT 
+					WE ADD WILL NOT ERASE THE CURRENT BALANCE INSTEAD IT WILL APPEND ON IT AS WELL AS WITHDRAW IT 
+					WILL MAKE MINUS OF THE MONEY TAKEN OUT*/
+					int balanceAccount=0;
+					String updateQuery="UPDATE account SET balance=? WHERE account_number='"+input+"'";
+					//here we are grabing the current amount so that to be append to the new amount that will be added
+					String getBalance="SELECT balance FROM account WHERE account_number='"+input+"'";
+
+					
+						PreparedStatement statement2=conn.prepareStatement(updateQuery);
+						PreparedStatement stat=conn.prepareStatement(getBalance);
+						ResultSet resultBalance=stat.executeQuery();
+						int currentBalance=0;//this will take the current amount that was in the database for a specific person
+						while(resultBalance.next()){
+							currentBalance=resultBalance.getInt(1);
+						}
+						//here we are calling the Person class into this Login class
+						
+						// here we are taking the new operation made and append to the current balance
+						balanceAccount=bal+currentBalance;
+						statement2.setInt(1,balanceAccount);
+						int result2=statement2.executeUpdate();
+						if (result2>0) {
+							System.out.println("Update Made Successully");
+							
+						}
 
 				}
+				
+				
 		}catch(SQLException e){
 					System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
 		}catch (Exception e) {
 					e.printStackTrace();
 			
 		}
-		/*FROM 107 UP TO 134 IS ABOUT UPDATING THE BALANCE AND WHAT 
-		WE ADD WILL NOT ERASE THE CURRENT BALANCE INSTEAD IT WILL APPEND ON IT AS WELL AS WITHDRAW IT 
-		WILL MAKE MINUS OF THE MONEY TAKEN OUT*/
-		int balanceAccount=0;
-		String updateQuery="UPDATE account SET balance=? WHERE account_number='"+input+"'";
-		//here we are grabing the current amount so that to be append to the new amount that will be added
-		String getBalance="SELECT balance FROM account WHERE account_number='"+input+"'";
-
-		try(Connection conn=DriverManager.getConnection(link,user,dbpassWord)){
-			PreparedStatement statement=conn.prepareStatement(updateQuery);
-			PreparedStatement stat=conn.prepareStatement(getBalance);
-			ResultSet resultBalance=stat.executeQuery();
-			int currentBalance=0;//this will take the current amount that was in the database for a specific person
-			while(resultBalance.next()){
-				currentBalance=resultBalance.getInt(1);
-			}
-			//here we are calling the Person class into this Login class
-			int bal=Person.bankOperations();
-			// here we are taking the new operation made and append to the current balance
-			balanceAccount=bal+currentBalance;
-			statement.setInt(1,balanceAccount);
-			int result=statement.executeUpdate();
-			if (result>0) {
-				System.out.println("Update Made Successully");
-				
-			}
-		}catch(SQLException e){
-			System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
-		}catch (Exception e) {
-			e.printStackTrace();
-			
-		}
+	
+		
 }
 	public static void signUpAndInsert(){
 		String link="jdbc:mysql://localhost:3306/Bank";
@@ -188,7 +194,7 @@ public class Person{
 					System.out.println("Account Created ");
 		}catch (SQLException e) {
 
-								System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
+			System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
 				
 		}catch (Exception e) {
 				e.printStackTrace();
@@ -196,5 +202,56 @@ public class Person{
 		}
 		
 	}
+	public static void transfer(String accountTransfer,int amountTransfer){
+			String link="jdbc:mysql://localhost:3306/Bank";
+			String user="root";
+			String dbpassWord="toor";
+			Scanner scan=new Scanner(System.in);
+			Console console=System.console();
+
+			
+			String checkquery="SELECT account_number FROM account WHERE account_number='"+accountTransfer+"'";
+			String updateQuery="UPDATE account SET balance=? WHERE account_number='"+accountTransfer+"'";
+			String checkquery2="SELECT balance FROM account WHERE account_number='"+accountTransfer+"'";
+
+			try(Connection conn=DriverManager.getConnection(link,user,dbpassWord)){
+				PreparedStatement statement=conn.prepareStatement(checkquery);
+				PreparedStatement statement2=conn.prepareStatement(checkquery2);
+				PreparedStatement statUpdate=conn.prepareStatement(updateQuery);
+				ResultSet result=statement.executeQuery();
+				ResultSet result2=statement2.executeQuery();
+				int count=0;
+				int amountAdded=0;
+				while(result.next()&&result2.next()){
+					String accountNumber=result.getString(1);//accountnumber
+					String output="You will be Transferring To User#%d:%s";
+					System.out.println(String.format(output,++count,accountNumber));
+					int currentBalance=result2.getInt(1);
+					amountAdded+=currentBalance;
+					// int amount=result2.getInt(1);
+
+					 int transferedAmount=amountAdded+amountTransfer;
+					statUpdate.setInt(1,transferedAmount);
+					int amountAddedResult=statUpdate.executeUpdate();
+					if (amountAddedResult>0) {
+						System.out.println();
+						System.out.println("Transferring Made Successfully!!");
+						
+					}
+					
+				}
+
+				// int bal=Person.bankOperations();
+				
+
+			}catch (SQLException e) {
+				System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
+				
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
+
+
+		} 
 
 }
