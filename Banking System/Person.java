@@ -3,65 +3,196 @@ import java.io.Console;
 import java.sql.*;
 import java.sql.SQLException;
 import java.sql.ResultSet;
-import java.sql.Connection;//this are the 	IMPORTS
+import java.sql.Connection;
+import java.util.InputMismatchException;
 public class Person{
-	private String accountNumber;
-	private String firstName;
-	private String lastName;
-	private String email;
-	private String password;//this are just unused Properties
+	
 
 	public Person(){}
-	public static int bankOperations(){
-		int anotherTransaction=1;
-		 int balance=0;
+	public static void bankOperations(){
+			
+			String link="jdbc:mysql://localhost:3306/Bank";
+			String user="root";
+			String dbpassWord="toor";
+			String getBalance="SELECT balance FROM account WHERE account_number='111-222-333-12'";
+			String updateQuery="UPDATE account SET balance=? WHERE account_number='111-222-333-12'";
 
-		Scanner scan=new Scanner(System.in);
-		while (anotherTransaction==1) {
-				System.out.println("What do you Want to do?");
-				System.out.println("#1.CheckBalance|#2.Deposit|#3.Withdraw|#4.Transfer");
-				int option=scan.nextInt();
-				switch (option) {
-					case 1:
-						System.out.println("your balance is:"+balance);
-						break;
-					case 2:{
-						System.out.println("How much do you want to deposit?");
-						int deposit=scan.nextInt();
-						balance+=deposit;
-						System.out.println("You have deposited:"+deposit+" Successfully");
-						break;
-					}
-					case 3:{
-						System.out.println("How much do you want to Withdraw?");
-						int withdraw=scan.nextInt();
-						balance-=withdraw;
-						System.out.println("You have Withdrawn:"+withdraw+" Successfully");
-						break;
-					}
-					case 4:{
-						System.out.println("Which account Do you want to Transfer to?");
-						System.out.println("follow this syntax:xxx-xxx-xxx-xx");
-						String accountTransfer=scan.next();
-						System.out.println("How much money You Want to Transfer?");
-						int amountTransfer=scan.nextInt();
-						balance-=amountTransfer;
-						transfer(accountTransfer,amountTransfer);
-						break;
-					}
-					default:
-						System.out.println("invalid transaction:)");
-						break;
-				}
-				anotherTransaction=0;
-				while(anotherTransaction!=1&&anotherTransaction!=2){
-					System.out.println("Do you want another transaction?");
-					System.out.println("Press #1.Yes|#2.No");
-					anotherTransaction=scan.nextInt();
-				}
-		}
-		return balance;
-}
+			int anotherTransaction=1;
+			 int balance=0;
+
+				Scanner scan=new Scanner(System.in);
+			while (anotherTransaction==1) {
+						System.out.println("What do you Want to do?");
+						System.out.println("#1.CheckBalance|#2.Deposit|#3.Withdraw|#4.Transfer");
+						int option=scan.nextInt();
+						
+						switch (option) {
+							case 1:{ 
+							try(Connection conn=DriverManager.getConnection(link,user,dbpassWord)){
+									
+
+								PreparedStatement stat=conn.prepareStatement(getBalance);
+								ResultSet resultBalance=stat.executeQuery();
+								//this will take the current amount that was in the database for a specific person
+								// int currentBalance=0;
+								while(resultBalance.next()){
+									int currentBalance=resultBalance.getInt(1);
+									System.out.println(String.format("Your Balance:%d",currentBalance));
+								}
+							}catch (SQLException e) {
+									System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
+									
+							}catch (Exception e) {
+								e.printStackTrace();
+							}
+								break;
+							}
+							case 2:{
+								System.out.println("How much do you want to deposit?");
+								try(Connection conn=DriverManager.getConnection(link,user,dbpassWord)){
+									PreparedStatement statement=conn.prepareStatement(getBalance);
+									PreparedStatement updateStatement=conn.prepareStatement(updateQuery);
+									int deposit=scan.nextInt();
+									if (deposit>0) {
+										
+												ResultSet resultBalance=statement.executeQuery();				
+												int currentBalance=0;
+												while(resultBalance.next()){
+													currentBalance=resultBalance.getInt(1);
+												}
+												
+												int balanceAccount=deposit+currentBalance;
+												updateStatement.setInt(1,balanceAccount);
+												int result2=updateStatement.executeUpdate();
+												if (result2>0) {
+													System.out.println("Update Made Successully");
+													
+												}
+
+									
+									System.out.println("You have deposited:"+deposit+" Successfully");
+									}else{
+										System.out.println("invalid Deposit Amount Can't be Negative:)");
+									}
+									
+								}catch (SQLException e) {
+									System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
+									
+								}catch (Exception e) {
+									e.printStackTrace();
+								}
+									
+								
+								break;
+							}
+							case 3:{
+								System.out.println("How much do you want to Withdraw?");
+
+								try(Connection conn=DriverManager.getConnection(link,user,dbpassWord)){
+										int withdraw=scan.nextInt();
+
+									PreparedStatement statement=conn.prepareStatement(getBalance);
+									PreparedStatement updateStatement=conn.prepareStatement(updateQuery);
+
+									ResultSet resultBalance=statement.executeQuery();				
+									int currentBalance=0;
+									while(resultBalance.next()){
+											currentBalance=resultBalance.getInt(1);
+										if (withdraw<=currentBalance) {
+											if (withdraw%5==0) {
+													int balanceAccount=currentBalance-withdraw;
+													updateStatement.setInt(1,balanceAccount);
+													int result2=updateStatement.executeUpdate();
+													if (result2>0) {
+														System.out.println("You have Withdrawn:"+withdraw+" Successfully");
+													}
+													
+											}else{
+
+												System.out.println("Money to Withdraw  has to be divisible by '5'");
+											}
+													
+											
+										}else{
+												System.out.println("insufficient amount :)");
+
+										}
+												
+									}
+								}catch (SQLException e) {
+									System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
+									
+								}catch (Exception e) {
+									e.printStackTrace();
+								}
+								
+								break;
+							}
+							case 4:{
+								try(Connection conn=DriverManager.getConnection(link,user,dbpassWord)){
+									PreparedStatement statement=conn.prepareStatement(getBalance);
+									PreparedStatement updateStatement=conn.prepareStatement(updateQuery);
+
+									System.out.println("Which account Do you want to Transfer to?");
+									System.out.println("follow this syntax:xxx-xxx-xxx-xx");
+									String accountTransfer=scan.next();
+									System.out.println("How much money You Want to Transfer?");
+									int amountTransfer=scan.nextInt();
+
+									ResultSet resultBalance=statement.executeQuery();				
+									int currentBalance=0;
+									int count=0;
+
+									while(resultBalance.next()){
+										currentBalance=resultBalance.getInt(1);
+										if (amountTransfer<=currentBalance) {
+											if (amountTransfer>=200) {
+
+												String output="You will be Transferring To User #%d:%s";
+												System.out.println(String.format(output,++count,accountTransfer));
+
+												int balanceAccount=currentBalance-amountTransfer;
+												updateStatement.setInt(1,balanceAccount);
+												int result2=updateStatement.executeUpdate();
+												if (result2>0) {
+													System.out.println("You have Transfered:"+amountTransfer+" Successfully");
+												}
+												
+											}else{
+
+												System.out.println("Minimum Transfer that can be made if From:'200'and 'Above'");
+												System.out.println("Try Encore!");
+											}
+											
+										}else{
+											System.out.println("insufficient amount :)");
+
+										}
+									}
+								}catch (SQLException e) {
+									System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
+									
+								}catch (Exception e) {
+									e.printStackTrace();
+								}
+								
+								break;
+							}
+							default:
+								System.out.println("invalid transaction:)");
+								break;
+						}
+						anotherTransaction=0;
+						while(anotherTransaction!=1&&anotherTransaction!=2){
+							System.out.println("Do you want another transaction?");
+							System.out.println("Press #1.Yes|#2.No");
+							anotherTransaction=scan.nextInt();
+						}
+			}
+				
+		
+		
+	}
 	public static void loginForm(){
 		Scanner scan=new Scanner(System.in);
 		Console console=System.console();
@@ -95,38 +226,12 @@ public class Person{
 					System.out.println(String.format(output,++count,accountNumber,firstName,lastName,email,password,balance));
 					// System.out.println("account is already exist Please Create other account");
 					System.out.println();
-					int bal=Person.bankOperations();
-					/*FROM 107 UP TO 134 IS ABOUT UPDATING THE BALANCE AND WHAT 
-					WE ADD WILL NOT ERASE THE CURRENT BALANCE INSTEAD IT WILL APPEND ON IT AS WELL AS WITHDRAW IT 
-					WILL MAKE MINUS OF THE MONEY TAKEN OUT*/
-					int balanceAccount=0;
-					String updateQuery="UPDATE account SET balance=? WHERE account_number='"+input+"'";
-					//here we are grabing the current amount so that to be append to the new amount that will be added
-					String getBalance="SELECT balance FROM account WHERE account_number='"+input+"'";
-
+					Person.bankOperations();
 					
-						PreparedStatement statement2=conn.prepareStatement(updateQuery);
-						PreparedStatement stat=conn.prepareStatement(getBalance);
-						ResultSet resultBalance=stat.executeQuery();
-						int currentBalance=0;//this will take the current amount that was in the database for a specific person
-						while(resultBalance.next()){
-							currentBalance=resultBalance.getInt(1);
-						}
-						//here we are calling the Person class into this Login class
-						
-						// here we are taking the new operation made and append to the current balance
-						balanceAccount=bal+currentBalance;
-						statement2.setInt(1,balanceAccount);
-						int result2=statement2.executeUpdate();
-						if (result2>0) {
-							System.out.println("Update Made Successully");
-							
-						}
-
 				}
 				
 				
-		}catch(SQLException e){
+		}	catch(SQLException e){
 					System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
 		}catch (Exception e) {
 					e.printStackTrace();
@@ -202,56 +307,6 @@ public class Person{
 		}
 		
 	}
-	public static void transfer(String accountTransfer,int amountTransfer){
-			String link="jdbc:mysql://localhost:3306/Bank";
-			String user="root";
-			String dbpassWord="toor";
-			Scanner scan=new Scanner(System.in);
-			Console console=System.console();
-
-			
-			String checkquery="SELECT account_number FROM account WHERE account_number='"+accountTransfer+"'";
-			String updateQuery="UPDATE account SET balance=? WHERE account_number='"+accountTransfer+"'";
-			String checkquery2="SELECT balance FROM account WHERE account_number='"+accountTransfer+"'";
-
-			try(Connection conn=DriverManager.getConnection(link,user,dbpassWord)){
-				PreparedStatement statement=conn.prepareStatement(checkquery);
-				PreparedStatement statement2=conn.prepareStatement(checkquery2);
-				PreparedStatement statUpdate=conn.prepareStatement(updateQuery);
-				ResultSet result=statement.executeQuery();
-				ResultSet result2=statement2.executeQuery();
-				int count=0;
-				int amountAdded=0;
-				while(result.next()&&result2.next()){
-					String accountNumber=result.getString(1);//accountnumber
-					String output="You will be Transferring To User#%d:%s";
-					System.out.println(String.format(output,++count,accountNumber));
-					int currentBalance=result2.getInt(1);
-					amountAdded+=currentBalance;
-					// int amount=result2.getInt(1);
-
-					 int transferedAmount=amountAdded+amountTransfer;
-					statUpdate.setInt(1,transferedAmount);
-					int amountAddedResult=statUpdate.executeUpdate();
-					if (amountAddedResult>0) {
-						System.out.println();
-						System.out.println("Transferring Made Successfully!!");
-						
-					}
-					
-				}
-
-				// int bal=Person.bankOperations();
-				
-
-			}catch (SQLException e) {
-				System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
-				
-			}catch (Exception e) {
-				e.printStackTrace();
-			}
-
-
-		} 
+	
 
 }
