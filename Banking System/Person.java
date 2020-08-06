@@ -9,13 +9,13 @@ public class Person{
 	
 
 	public Person(){}
-	public static void bankOperations(){
+	public static void bankOperations(String input){
 			
 			String link="jdbc:mysql://localhost:3306/Bank";
 			String user="root";
 			String dbpassWord="toor";
-			String getBalance="SELECT balance FROM account WHERE account_number='111-222-333-12'";
-			String updateQuery="UPDATE account SET balance=? WHERE account_number='111-222-333-12'";
+			String getBalance="SELECT balance FROM account WHERE account_number='"+input+"'";
+			String updateQuery="UPDATE account SET balance=? WHERE account_number='"+input+"'";
 
 			int anotherTransaction=1;
 			 int balance=0;
@@ -226,7 +226,7 @@ public class Person{
 					System.out.println(String.format(output,++count,accountNumber,firstName,lastName,email,password,balance));
 					// System.out.println("account is already exist Please Create other account");
 					System.out.println();
-					Person.bankOperations();
+					Person.bankOperations(input);
 					
 				}
 				
