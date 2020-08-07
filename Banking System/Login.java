@@ -20,7 +20,7 @@ public class Login{
 
 		System.out.println("	Login | Sign Up");
 		System.out.println("	================");
-		System.out.println("	#1.Login |#2.SignUp");
+		System.out.println("	#1.Login |#2.SignUp |#3.Admin");
 		int option=scan.nextInt();
 		//Here is Where there is the Welcome Design
 		if (option==1) {
@@ -29,6 +29,9 @@ public class Login{
 		}
 		else if (option==2) {
 					Person.signUpAndInsert();
+		}
+		else if(option==3){
+			Admin.admin();
 		}
 		/*THIS IS HELPIING TO HELP A USER TO START THE OPERATION OR LOG OUT IF THEY NEED TO 
 		BY NO NEED OF TERMINATING THE PROGRAM QUICKLY*/

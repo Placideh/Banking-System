@@ -23,6 +23,20 @@
 -- ALTER TABLE account DROP COLUMN balance;
 -- SELECT * FROM account;
 -- ALTER TABLE account ADD COLUMN balance INT(10) NOT NULL;
-SELECT * FROM account;
+-- SELECT * FROM account;
 
 
+-- UPDATE account SET account_number='111-222-333-12' WHERE account_number='112-222-333-12';
+-- so this query above I never know that it is going to work but  I did and I am excited 
+-- SELECT * FROM account;
+-- CREATE DATABASE Admin;
+-- USE admin;
+-- CREATE TABLE admin (
+-- 	name VARCHAR(100) NOT NULL,
+-- 	password VARCHAR(255) NOT NULL,
+-- 	PRIMARY KEY(name)
+
+
+-- );
+-- INSERT INTO admin (name,password)VALUES('Admin','123');
+SELECT * FROM admin;	

@@ -43,7 +43,9 @@ public class Person{
 									System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
 									
 							}catch (Exception e) {
-								e.printStackTrace();
+								// e.printStackTrace();
+									System.out.println("invalid Input Please Follow Well the Syntax");
+
 							}
 								break;
 							}
@@ -79,7 +81,9 @@ public class Person{
 									System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
 									
 								}catch (Exception e) {
-									e.printStackTrace();
+									// e.printStackTrace();
+									System.out.println("invalid Input Please Follow Well the Syntax");
+
 								}
 									
 								
@@ -123,7 +127,9 @@ public class Person{
 									System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
 									
 								}catch (Exception e) {
-									e.printStackTrace();
+									// e.printStackTrace();
+									System.out.println("invalid Input Please Follow Well the Syntax");
+
 								}
 								
 								break;
@@ -173,7 +179,8 @@ public class Person{
 									System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
 									
 								}catch (Exception e) {
-									e.printStackTrace();
+									// e.printStackTrace();
+									System.out.println("invalid Input Please Follow Well the Syntax");
 								}
 								
 								break;
@@ -205,9 +212,7 @@ public class Person{
 		String  pass=new String(console.readPassword("PassWord:"));
 		System.out.println("Account:"+input+" | PassWord:"+pass);
 		String QUERY="SELECT * FROM account WHERE account_number='" + input + "' AND password='" + pass + "'";
-		if (!QUERY.contains(input)&&QUERY.contains(pass)) {
-			return;
-		}
+		
 
 		try(Connection conn=DriverManager.getConnection(link,user,dbpassWord)){
 				PreparedStatement statement=conn.prepareStatement(QUERY);
@@ -234,7 +239,9 @@ public class Person{
 		}	catch(SQLException e){
 					System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
 		}catch (Exception e) {
-					e.printStackTrace();
+					// e.printStackTrace();
+					System.out.println("invalid Input Please Follow Well the Syntax");
+
 			
 		}
 	
@@ -268,7 +275,9 @@ public class Person{
 			System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
 			
 		}catch (Exception e) {
-			e.printStackTrace();
+			// e.printStackTrace();
+					System.out.println("invalid Input Please Follow Well the Syntax");
+
 			
 		}
 		/* THE INSERT WILL CONTINUE BY HERE IF EVERYTHING IS OKAY BUT 
@@ -280,6 +289,7 @@ public class Person{
 		String lastName=lName.substring(0,1).toUpperCase()+lName.substring(1);
 		System.out.print("Email:");
 		String email=scan.next();
+		if(!email.contains("@")||!email.contains(".")){System.out.println("Please write a valid email!");return;}
 		String  passWord=new String(console.readPassword("PassWord:"));
 		int balance=0;
 		System.out.println("Account:"+account+" |FistName:"+firstName+"|LastName:"+lastName+" |Email:"+email+" |PassWord:"+passWord+"|Balance:"+balance);
@@ -302,7 +312,9 @@ public class Person{
 			System.err.format("SQLSTATE:%s\n%s",e.getSQLState(),e.getMessage());
 				
 		}catch (Exception e) {
-				e.printStackTrace();
+				// e.printStackTrace();
+					System.out.println("invalid Input Please Follow Well the Syntax");
+
 				
 		}
 		
